@@ -16,17 +16,19 @@ namespace CliClient
                 .Build();
 
             var client = new SignalRClient(connection);
-            await connection.StartAsync();
 
             connection.Reconnected += _ =>
             {
-                Console.WriteLine($"Reconnected, new connection state {connection.State}");
+                Console.WriteLine($"Reconnected, new connection state \"{connection.State}\", new id: {connection.ConnectionId}");
                 return Task.CompletedTask;
             };
 
+            await connection.StartAsync();
+            Console.WriteLine($"my id: {connection.ConnectionId}");
+
             while (true)
             {
-                await Task.Delay(TimeSpan.FromSeconds(2));
+                await Task.Delay(TimeSpan.FromSeconds(1));
                 Console.WriteLine("Enter message: ");
                 var message = Console.ReadLine();
                 await client.SendMessage(message);

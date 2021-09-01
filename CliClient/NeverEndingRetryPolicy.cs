@@ -27,8 +27,7 @@ namespace CliClient
         private void LogRetry(RetryContext retryContext)
         {
             var message = $"Retry attempt {retryContext.PreviousRetryCount + 1}, " +
-                          $"{_delay} delay before next retry. " +
-                          $"Retry reason:\"{retryContext.RetryReason}\"";
+                          $"{_delay} delay before next retry. ";
             Console.WriteLine(message);
         }
     }
