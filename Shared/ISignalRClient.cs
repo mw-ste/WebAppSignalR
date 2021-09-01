@@ -7,5 +7,9 @@
         Task ReceiveMessage(string sender, string message);
 
         Task Acknowledge();
+
+        Task NotifyUserAdded(string user);
+
+        Task NotifyUserLeft(string user);
     }
 }
