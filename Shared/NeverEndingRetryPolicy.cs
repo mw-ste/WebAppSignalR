@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.AspNetCore.SignalR.Client;
 
-namespace CliClient
+namespace Shared
 {
     public class NeverEndingRetryPolicy : IRetryPolicy
     {

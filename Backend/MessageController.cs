@@ -20,46 +20,38 @@ namespace Backend
         }
 
         [HttpPost("MessageAll")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> MessageAll([Required] string message)
         {
-            try
-            {
-                await _hubContext
+            return await Execute(
+                _hubContext
                     .Clients
                     .All
-                    .ReceiveMessage("TheBackend", message);
-
-                return Ok();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                return StatusCode(StatusCodes.Status400BadRequest, null);
-            }
+                    .ReceiveMessage("TheBackend", message));
         }
 
         [HttpPost("MessageUser")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> MessageUser([Required] string connectionId, [Required] string message)
+        {
+            return await Execute(
+                _hubContext
+                    .Clients
+                    .Client(connectionId)
+                    .ReceiveMessage("TheBackend", message));
+        }
+
+        private async Task<ActionResult> Execute(Task action)
         {
             try
             {
-                await _hubContext
-                    .Clients
-                    .Client(connectionId)
-                    .ReceiveMessage("TheBackend", message);
+                await action;
 
                 return Ok();
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                return StatusCode(StatusCodes.Status400BadRequest, null);
+                return StatusCode(StatusCodes.Status500InternalServerError, e);
             }
-
         }
     }
 }
