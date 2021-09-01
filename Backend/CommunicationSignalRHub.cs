@@ -8,8 +8,13 @@ namespace Backend
         public async Task SendMessageToAllClients(string sender, string message)
         {
             await Clients
-                .All
+                .Caller
+                .SendAsync("Acknowledge");
+
+            await Clients
+                .Others
                 .SendAsync("ReceiveMessage", sender, message);
+
         }
     }
 }
