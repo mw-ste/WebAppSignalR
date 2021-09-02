@@ -1,3 +1,4 @@
+using Microsoft.Azure.SignalR;
 using Microsoft.Extensions.Logging;
 
 namespace Backend
@@ -15,7 +16,8 @@ namespace Backend
         {
             services
                 .AddSignalR()
-                .AddAzureSignalR();
+                .AddAzureSignalR(options => 
+                    options.GracefulShutdown.Mode = GracefulShutdownMode.MigrateClients); // just to check ;-)
 
             services.AddControllers();
             services.AddSwaggerGen();
