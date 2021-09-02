@@ -8,10 +8,12 @@ namespace CliClient
     public class SignalRClient : ISignalRClient
     {
         private readonly HubConnection _hubConnection;
+        private readonly string _name;
 
-        public SignalRClient(HubConnection hubConnection)
+        public SignalRClient(HubConnection hubConnection, string name)
         {
             _hubConnection = hubConnection;
+            _name = name;
             SubscribeToHub();
 
             _hubConnection.Closed += OnClosed;
@@ -64,9 +66,19 @@ namespace CliClient
             return Task.CompletedTask;
         }
 
-        public async Task SendMessage(string message)
+        public async Task SendMessageToAllClients(string message)
         {
-            await _hubConnection.SendCoreAsync("SendMessageToAllClients", new object[]{_hubConnection.ConnectionId, message});
+            await _hubConnection.SendCoreAsync("SendMessageToAllClients", new object[] { _name, message });
+        }
+
+        public async Task SendMessageToClient(string target, string message)
+        {
+            await _hubConnection.SendCoreAsync("SendMessageToClient", new object[] { _name, target, message });
+        }
+
+        public async Task RegisterWithName()
+        {
+            await _hubConnection.SendCoreAsync("RegisterWithName", new object[] { _name });
         }
     }
 }
