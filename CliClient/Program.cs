@@ -18,12 +18,6 @@ namespace CliClient
 
             var client = new SignalRClient(connection);
 
-            connection.Reconnected += _ =>
-            {
-                Console.WriteLine($"Reconnected, new connection state \"{connection.State}\", new id: {connection.ConnectionId}");
-                return Task.CompletedTask;
-            };
-
             await connection.StartAsync();
             Console.WriteLine($"my id: {connection.ConnectionId}");
 

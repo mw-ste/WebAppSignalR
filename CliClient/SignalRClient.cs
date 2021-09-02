@@ -13,6 +13,23 @@ namespace CliClient
         {
             _hubConnection = hubConnection;
             SubscribeToHub();
+
+            _hubConnection.Closed += OnClosed;
+            _hubConnection.Reconnected += Reconnected;
+        }
+
+        private Task Reconnected(string newConnectionId)
+        {
+            Console.WriteLine($"Hub reconnected with new id {newConnectionId}, " +
+                              $"new connection state \"{_hubConnection.State}\"");
+            return Task.CompletedTask;
+        }
+
+        private Task OnClosed(Exception exception)
+        {
+            Console.WriteLine($"Hub connection {_hubConnection.ConnectionId} was closed!\n" +
+                              $"Reason: {exception}");
+            return Task.CompletedTask;
         }
 
         private void SubscribeToHub()

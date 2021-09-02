@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Logging;
+
 namespace Backend
 {
     using Microsoft.AspNetCore.Builder;
@@ -17,6 +19,10 @@ namespace Backend
 
             services.AddControllers();
             services.AddSwaggerGen();
+
+            services.AddSingleton(provider => new EvilSurveillanceLogger(provider.GetService<ILogger<EvilSurveillanceLogger>>()));
+
+            services.AddHostedService<EvilSurveillanceBackgroundService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

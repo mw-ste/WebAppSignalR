@@ -1,9 +1,9 @@
 namespace Backend
 {
     using System;
-    using Shared;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.SignalR;
+    using Shared;
 
     // Hubs are transient !!!
     public class CommunicationSignalRHub : Hub<ISignalRClient>
