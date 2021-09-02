@@ -45,15 +45,19 @@ namespace Backend
 
         private Task Reconnected(string newConnectionId)
         {
-            Console.WriteLine($"Hub reconnected with new id {newConnectionId}, " +
-                              $"new connection state \"{_connection.State}\"");
+            Console.WriteLine(
+                $"Hub reconnected with new id {newConnectionId}, " +
+                $"new connection state \"{_connection.State}\"");
+
             return Task.CompletedTask;
         }
 
         private Task OnClosed(Exception exception)
         {
-            Console.WriteLine($"Hub connection {_connection.ConnectionId} was closed!\n" +
-                              $"Reason: {exception}");
+            Console.WriteLine(
+                $"Hub connection {_connection.ConnectionId} was closed!\n" +
+                $"Reason: {exception}");
+
             return Task.CompletedTask;
         }
 

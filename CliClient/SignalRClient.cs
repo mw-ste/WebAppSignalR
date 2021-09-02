@@ -18,19 +18,31 @@ namespace CliClient
 
             _hubConnection.Closed += OnClosed;
             _hubConnection.Reconnected += Reconnected;
+            _hubConnection.Reconnecting += Reconnecting;
         }
 
-        private Task Reconnected(string newConnectionId)
+        private static Task Reconnecting(Exception exception)
         {
-            Console.WriteLine($"Hub reconnected with new id {newConnectionId}, " +
-                              $"new connection state \"{_hubConnection.State}\"");
+            Console.WriteLine($"Reconnecting. Connection was interrupted because of \"{exception}\"");
+
             return Task.CompletedTask;
+        }
+
+        private async Task Reconnected(string newConnectionId)
+        {
+            Console.WriteLine(
+                $"Hub reconnected with new id {newConnectionId}, " +
+                $"new connection state \"{_hubConnection.State}\"");
+
+            await RegisterWithName();
         }
 
         private Task OnClosed(Exception exception)
         {
-            Console.WriteLine($"Hub connection {_hubConnection.ConnectionId} was closed!\n" +
-                              $"Reason: {exception}");
+            Console.WriteLine(
+                $"Hub connection {_hubConnection.ConnectionId} was closed!\n" +
+                $"Reason: {exception}");
+
             return Task.CompletedTask;
         }
 

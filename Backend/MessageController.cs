@@ -26,17 +26,17 @@ namespace Backend
                 _hubContext
                     .Clients
                     .All
-                    .ReceiveMessage("TheBackend", message));
+                    .ReceiveMessage("the backend", message));
         }
 
         [HttpPost("MessageUser")]
-        public async Task<ActionResult> MessageUser([Required] string connectionId, [Required] string message)
+        public async Task<ActionResult> MessageUser([Required] string name, [Required] string message)
         {
             return await Execute(
                 _hubContext
                     .Clients
-                    .Client(connectionId)
-                    .ReceiveMessage("TheBackend", message));
+                    .Group(name)
+                    .ReceiveMessage("the backend", message));
         }
 
         private async Task<ActionResult> Execute(Task action)
