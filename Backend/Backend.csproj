@@ -2,9 +2,11 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
+    <UserSecretsId>8fbf5b6d-dd6e-4ce3-945c-da380ea43d9c</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Azure.SignalR" Version="1.10.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.1" />
   </ItemGroup>
 
