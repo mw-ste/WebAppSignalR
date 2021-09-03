@@ -6,10 +6,18 @@ namespace Shared
     public class NeverEndingRetryPolicy : IRetryPolicy
     {
         private readonly TimeSpan _delay;
+        private readonly Action<string> _log;
 
         public NeverEndingRetryPolicy(TimeSpan delay)
         {
             _delay = delay;
+            _log = Console.WriteLine;
+        }
+
+        public NeverEndingRetryPolicy(TimeSpan delay, Action<string> logMethod)
+        {
+            _delay = delay;
+            _log = logMethod;
         }
 
         public TimeSpan? NextRetryDelay(RetryContext retryContext)
@@ -28,7 +36,7 @@ namespace Shared
         {
             var message = $"Retry attempt {retryContext.PreviousRetryCount + 1}, " +
                           $"{_delay} delay before next retry. ";
-            Console.WriteLine(message);
+            _log(message);
         }
     }
 }
