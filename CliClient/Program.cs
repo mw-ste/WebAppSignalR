@@ -18,7 +18,7 @@ namespace CliClient
                 .Build();
 
             var client = new SignalRClient(connection, name);
-            await connection.StartAsync();
+            await client.ConnectToHub();
             await client.RegisterWithName();
 
             Console.WriteLine($"my id: {connection.ConnectionId}");
@@ -32,7 +32,7 @@ namespace CliClient
                 var receiver = Console.ReadLine();
                 if (receiver?.ToLower() == "exit")
                 {
-                    await client.SendDisconnect();
+                    await Disconnect(client);
                     continue;
                 }
 
@@ -40,7 +40,7 @@ namespace CliClient
                 var message = Console.ReadLine();
                 if (message?.ToLower() == "exit")
                 {
-                    await client.SendDisconnect();
+                    await Disconnect(client);
                     continue;
                 }
 
@@ -53,6 +53,13 @@ namespace CliClient
                     await client.SendMessageToClient(receiver, message);
                 }
             }
+        }
+
+        private static async Task Disconnect(SignalRClient client)
+        {
+            await client.Disconnect();
+            await client.SendDisconnect();
+            //await client.DisposeConnection();
         }
     }
 }
