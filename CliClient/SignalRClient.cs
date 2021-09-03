@@ -31,7 +31,7 @@ namespace CliClient
         private async Task Reconnected(string newConnectionId)
         {
             Console.WriteLine(
-                $"Hub reconnected with new id {newConnectionId}, " +
+                $"Hub reconnected with new id \"{newConnectionId}\", " +
                 $"new connection state \"{_hubConnection.State}\"");
 
             await RegisterWithName();
@@ -40,8 +40,8 @@ namespace CliClient
         private Task OnClosed(Exception exception)
         {
             Console.WriteLine(
-                $"Hub connection {_hubConnection.ConnectionId} was closed!\n" +
-                $"Reason: {exception}");
+                $"Hub connection \"{_hubConnection.ConnectionId}\" was closed!\n" +
+                $"Reason: \"{exception}\"");
 
             return Task.CompletedTask;
         }
@@ -91,6 +91,11 @@ namespace CliClient
         public async Task RegisterWithName()
         {
             await _hubConnection.SendCoreAsync("RegisterWithName", new object[] { _name });
+        }
+
+        public async Task SendDisconnect()
+        {
+            await _hubConnection.SendCoreAsync("DisconnectMe", new object[0]);
         }
     }
 }
