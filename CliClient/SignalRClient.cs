@@ -21,6 +21,11 @@ namespace CliClient
             _hubConnection.Reconnecting += Reconnecting;
         }
 
+        public async Task ConnectToHub()
+        {
+            await _hubConnection.StartSafelyAsync(TimeSpan.FromSeconds(10));
+        }
+
         private static Task Reconnecting(Exception exception)
         {
             Console.WriteLine($"Reconnecting. Connection was interrupted because of \"{exception}\"");
@@ -31,19 +36,20 @@ namespace CliClient
         private async Task Reconnected(string newConnectionId)
         {
             Console.WriteLine(
-                $"Hub reconnected with new id {newConnectionId}, " +
+                $"Hub reconnected with new id \"{newConnectionId}\", " +
                 $"new connection state \"{_hubConnection.State}\"");
 
             await RegisterWithName();
         }
 
-        private Task OnClosed(Exception exception)
+        private async Task OnClosed(Exception exception)
         {
             Console.WriteLine(
-                $"Hub connection {_hubConnection.ConnectionId} was closed!\n" +
-                $"Reason: {exception}");
+                $"Hub connection \"{_hubConnection.ConnectionId}\" was closed!\n" +
+                $"Reason: \"{exception}\"");
 
-            return Task.CompletedTask;
+            await _hubConnection.StartSafelyAsync(TimeSpan.FromSeconds(10));
+            await RegisterWithName();
         }
 
         private void SubscribeToHub()
@@ -91,6 +97,21 @@ namespace CliClient
         public async Task RegisterWithName()
         {
             await _hubConnection.SendCoreAsync("RegisterWithName", new object[] { _name });
+        }
+
+        public async Task SendDisconnect()
+        {
+            await _hubConnection.SendCoreAsync("DisconnectMe", new object[0]);
+        }
+
+        public async Task Disconnect()
+        {
+            await _hubConnection.StopAsync();
+        }
+
+        public async Task DisposeConnection()
+        {
+            await _hubConnection.DisposeAsync();
         }
     }
 }

@@ -53,6 +53,12 @@
 - group membership isn't preserved when a connection reconnects
 - the connection needs to rejoin the group when it's re-established.
 
+### Reconnecting a disconnected HubConnection
+
+* when the connection was disconnected by the hub calling `Context.Abort();` &rarr; hub connection can be reconnected by the client
+* when the connection was disconnected by the client calling `_hubConnection.StopAsync();` &rarr; hub connection can be reconnected by the client
+* when the connection was disconnected by the client calling `_hubConnection.DisposeAsync();` &rarr; hub connection can **not** be reconnected by the client
+
 ## SignalR, WPF, MVVM, DI
 
   * https://docs.microsoft.com/en-us/dotnet/core/extensions/dependency-injection

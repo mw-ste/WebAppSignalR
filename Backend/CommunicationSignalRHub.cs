@@ -47,6 +47,13 @@ namespace Backend
             await Groups.AddToGroupAsync(Context.ConnectionId, sender);
         }
 
+        public void DisconnectMe()
+        {
+            _logger.LogInformation($"Closing connection with id {Context.ConnectionId}");
+
+            Context.Abort();
+        }
+
         public override async Task OnConnectedAsync()
         {
             await base.OnConnectedAsync();
