@@ -42,6 +42,12 @@
 - stored in: `%APPDATA%\Microsoft\UserSecrets\<user_secrets_id>\secrets.json`
 - in `Startup.cs` in `ConfigureServices`: `services.AddSignalR().AddAzureSignalR();`
 
+### Running without Azure
+
+- if you get the following error, then your have not configured a connection string
+- `Microsoft.Azure.SignalR.Common.AzureSignalRConfigurationNoEndpointException: No connection string was specified.`
+- to run the SignalR server locally instead of the Azure SignalR service, remove `.AddAzureSignalR(...)` from the line `services.AddSignalR().AddAzureSignalR();` in the file `Startup.cs`
+
 ### Groups
 
 - group membership isn't preserved when a connection reconnects
