@@ -7,8 +7,11 @@ namespace GuiClient
     /// </summary>
     public partial class MainWindow : Window
     {
-        public MainWindow()
+        private readonly MainWindowViewModel _viewModel;
+
+        public MainWindow(MainWindowViewModel viewModel)
         {
+            _viewModel = viewModel;
             InitializeComponent();
         }
     }

@@ -52,3 +52,9 @@
 
 - group membership isn't preserved when a connection reconnects
 - the connection needs to rejoin the group when it's re-established.
+
+## SignalR, WPF, MVVM, DI
+
+  * https://docs.microsoft.com/en-us/dotnet/core/extensions/dependency-injection
+  * https://intellitect.com/getting-started-model-view-viewmodel-mvvm-pattern-using-windows-presentation-framework-wpf/
+  * https://marcominerva.wordpress.com/2019/11/07/update-on-using-hostbuilder-dependency-injection-and-service-provider-with-net-core-3-0-wpf-applications/
