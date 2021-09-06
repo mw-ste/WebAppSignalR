@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
 using Shared;
@@ -13,8 +13,8 @@ namespace GuiClient
         private string _name;
 
         public SignalRClient(
-            HubConnection hubConnection, 
-            Action<string> logMessage, 
+            HubConnection hubConnection,
+            Action<string> logMessage,
             Action<string> logInfo)
         {
             _hubConnection = hubConnection;

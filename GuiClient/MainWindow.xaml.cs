@@ -14,6 +14,7 @@ namespace GuiClient
 
         public MainWindow()
         {
+            //_viewModel = viewModel;
             InitializeComponent();
             SendMessageButton.IsEnabled = false;
 

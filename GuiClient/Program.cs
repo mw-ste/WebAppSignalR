@@ -8,8 +8,7 @@ namespace GuiClient
 {
     class Program
     {
-        [STAThread]
-        static void Main(string[] args)
+        static void Foo(string[] args)
         {
             var mainWindow = new MainWindow();
 
