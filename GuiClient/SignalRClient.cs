@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.Logging;
 using Shared;
 
 namespace GuiClient
@@ -8,25 +9,19 @@ namespace GuiClient
     public class SignalRClient : ISignalRClient
     {
         private readonly HubConnection _hubConnection;
-        private readonly Action<string> _logMessage;
-        private readonly Action<string> _logInfo;
+        private readonly ILogger<SignalRClient> _logger;
         private string _name;
 
-        public SignalRClient(
-            HubConnection hubConnection,
-            Action<string> logMessage,
-            Action<string> logInfo)
+        public event Action<string, string> MessageReceived;
+        public event Action MessageSent;
+        public event Action<string> UserJoined;
+        public event Action<string> UserLeft;
+
+        public SignalRClient(HubConnection hubConnection, ILogger<SignalRClient> logger)
         {
             _hubConnection = hubConnection;
-            _logMessage = logMessage;
-            _logInfo = logInfo;
-
+            _logger = logger;
             SubscribeToHub();
-        }
-
-        public async Task StartConnection()
-        {
-            await _hubConnection.StartAsync();
         }
 
         private void SubscribeToHub()
@@ -41,77 +36,84 @@ namespace GuiClient
             _hubConnection.On<string>(nameof(NotifyUserLeft), NotifyUserLeft);
         }
 
+        private async Task StartConnection()
+        {
+            await _hubConnection.StartSafelyAsync(TimeSpan.FromSeconds(10), _logger);
+        }
+
         private Task Reconnecting(Exception exception)
         {
-            _logInfo($"Reconnecting. Connection was interrupted because of \"{exception}\"");
             return Task.CompletedTask;
         }
 
         private async Task Reconnected(string newConnectionId)
         {
-            _logInfo(
-                $"Hub reconnected with new id {newConnectionId}, " +
-                $"new connection state \"{_hubConnection.State}\"");
-
             await RegisterWithName();
         }
 
-        private Task OnClosed(Exception exception)
+        private async Task OnClosed(Exception exception)
         {
-            _logInfo(
-                $"Hub connection {_hubConnection.ConnectionId} was closed!\n" +
-                $"Reason: {exception}");
-
-            return Task.CompletedTask;
+            await StartConnection();
+            await RegisterWithName();
         }
 
-        public Task Register(string name)
+        public async Task Register(string name)
         {
             _name = name;
-            return RegisterWithName();
+            await StartConnection();
+            await RegisterWithName();
         }
 
         public Task ReceiveMessage(string sender, string message)
         {
-            _logMessage($"{sender}: {message}");
-
+            MessageReceived?.Invoke(sender, message);
             return Task.CompletedTask;
         }
 
         public Task Acknowledge()
         {
-            _logInfo("Message successfully sent");
-
+            MessageSent?.Invoke();
             return Task.CompletedTask;
         }
 
         public Task NotifyUserAdded(string user)
         {
-            _logInfo($"{user} joined the conversation");
-
+            UserJoined?.Invoke(user);
             return Task.CompletedTask;
         }
 
         public Task NotifyUserLeft(string user)
         {
-            _logInfo($"{user} left the conversation");
-
+            UserLeft?.Invoke(user);
             return Task.CompletedTask;
+        }
+
+        public async Task RegisterWithName()
+        {
+            EnsureConnected();
+            await _hubConnection.SendCoreAsync("RegisterWithName", new object[] { _name });
         }
 
         public async Task SendMessageToAllClients(string message)
         {
+            EnsureConnected();
             await _hubConnection.SendCoreAsync("SendMessageToAllClients", new object[] { _name, message });
         }
 
         public async Task SendMessageToClient(string target, string message)
         {
+            EnsureConnected();
             await _hubConnection.SendCoreAsync("SendMessageToClient", new object[] { _name, target, message });
         }
 
-        public async Task RegisterWithName()
+        private void EnsureConnected()
         {
-            await _hubConnection.SendCoreAsync("RegisterWithName", new object[] { _name });
+            if (string.IsNullOrEmpty(_name) || _hubConnection.State != HubConnectionState.Connected)
+            {
+                throw new Exception(
+                    $"Trying to invoke hub method while name is \"{_name}\" " +
+                    $"and connection state is \"{_hubConnection.State}\"");
+            }
         }
     }
 }
