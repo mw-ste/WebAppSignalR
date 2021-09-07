@@ -1,7 +1,4 @@
-using System;
 using System.Windows;
-using Microsoft.AspNetCore.SignalR.Client;
-using Shared;
 
 namespace GuiClient
 {
@@ -10,19 +7,16 @@ namespace GuiClient
     /// </summary>
     public partial class MainWindow : Window
     {
-        private SignalRClient _signalRClient;
+        private readonly SignalRClient _signalRClient;
 
-        public MainWindow()
+        public MainWindow(SignalRClient signalRClient)
         {
+            _signalRClient = signalRClient;
+
             //_viewModel = viewModel;
             InitializeComponent();
             SendMessageButton.IsEnabled = false;
 
-        }
-
-        public void SetSignalRClient(SignalRClient signalRClient)
-        {
-            _signalRClient = signalRClient;
         }
 
         public void LogInfo(string info)

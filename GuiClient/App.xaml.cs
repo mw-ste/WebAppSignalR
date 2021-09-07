@@ -3,6 +3,7 @@ using System.Windows;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Shared;
 
 namespace GuiClient
@@ -28,19 +29,23 @@ namespace GuiClient
 
             return Host
                 .CreateDefaultBuilder()
+                .ConfigureLogging(logging =>
+                {
+                    logging.ClearProviders();
+                    logging.AddConsole();
+                })
                 .ConfigureServices((_, services) =>
                 {
                     services.AddSingleton(connection);
-                    services.AddSingleton<ISignalRClient, SignalRClient>();
                     services.AddSingleton<MainWindowViewModel>();
                     services.AddSingleton<MainWindow>();
+                    services.AddSingleton<SignalRClient>();
                 });
         }
 
         protected override async void OnStartup(StartupEventArgs startupEventArgs)
         {
             await _host.StartAsync();
-            await _host.Services.GetRequiredService<HubConnection>().StartAsync();
 
             var mainWindow = _host.Services.GetRequiredService<MainWindow>();
             mainWindow.Show();
