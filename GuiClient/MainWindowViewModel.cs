@@ -25,7 +25,18 @@ namespace GuiClient
 
             SendMessageCommand = new Command(
                 async _ => await SendMessage(),
-                _ => Registered);
+                _ => Registered && !string.IsNullOrEmpty(Message));
+
+            Subscribe();
+        }
+
+        private void Subscribe()
+        {
+            _signalRClient.MessageReceived += (user, message) => MessageLog += $"{user}: {message}\n";
+            _signalRClient.MessageSent += () => InfoLog += "Message sent\n";
+
+            _signalRClient.UserJoined += user => InfoLog += $"User {user} joined\n";
+            _signalRClient.UserLeft += user => InfoLog += $"User {user} left\n";
         }
 
         private async Task Register()
@@ -49,7 +60,6 @@ namespace GuiClient
                 await _signalRClient.SendMessageToClient(Receiver, Message);
             }
 
-            Receiver = string.Empty;
             Message = string.Empty;
         }
 
@@ -77,13 +87,23 @@ namespace GuiClient
         public string UserName
         {
             get => _userName;
-            set => SetProperty(nameof(UserName), ref _userName, value);
+            set
+            {
+                SetProperty(nameof(UserName), ref _userName, value);
+                RegisterCommand.NotifyCanExecuteChanged();
+            }
         }
+
         public string Message
         {
             get => _message;
-            set => SetProperty(nameof(Message), ref _message, value);
+            set
+            {
+                SetProperty(nameof(Message), ref _message, value);
+                SendMessageCommand.NotifyCanExecuteChanged();
+            }
         }
+
         public string Receiver
         {
             get => _receiver;

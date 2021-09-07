@@ -4,8 +4,10 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:guiclient="clr-namespace:GuiClient"
+    d:DataContext="{d:DesignInstance Type=guiclient:MainWindowViewModel}"
     mc:Ignorable="d"
-    Title="MainWindow"
+    Title="GuiClient"
     Height="450"
     Width="800">
 
@@ -33,13 +35,14 @@
             <TextBox
                 Grid.Column="1"
                 Name="UserName"
-                Margin="5"/>
+                Margin="5"
+                Text="{Binding Path=UserName, UpdateSourceTrigger=PropertyChanged}"/>
 
             <Button
                 Grid.Column="2"
                 Name="RegisterButton"
                 Margin="5"
-                Click="Register">
+                Command="{Binding Path=RegisterCommand}">
                 Register
             </Button>
         </Grid>
@@ -62,7 +65,8 @@
             <TextBox
                 Grid.Column="1"
                 Name="Receiver"
-                Margin="5"/>
+                Margin="5"
+                Text="{Binding Path=Receiver, UpdateSourceTrigger=PropertyChanged}"/>
 
             <TextBlock
                 Grid.Column="2"
@@ -73,13 +77,14 @@
             <TextBox
                 Grid.Column="3"
                 Name="Message"
-                Margin="5"/>
+                Margin="5"
+                Text="{Binding Path=Message, UpdateSourceTrigger=PropertyChanged}"/>
 
             <Button
                 Grid.Column="4"
                 Name="SendMessageButton"
                 Margin="5"
-                Click="SendMessage">
+                Command="{Binding Path=SendMessageCommand}">
                 Send
             </Button>
         </Grid>
@@ -89,13 +94,15 @@
             Name="ReceivedMessages"
             IsReadOnly="True"
             TextWrapping="WrapWithOverflow"
-            Margin="5"/>
+            Margin="5"
+            Text="{Binding Path=MessageLog}"/>
 
         <TextBox
             Grid.Row="3"
             Name="Log"
             IsReadOnly="True"
             TextWrapping="WrapWithOverflow"
-            Margin="5"/>
+            Margin="5"
+            Text="{Binding Path=InfoLog}"/>
     </Grid>
 </Window>

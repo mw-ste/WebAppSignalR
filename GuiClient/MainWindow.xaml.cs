@@ -7,16 +7,10 @@ namespace GuiClient
     /// </summary>
     public partial class MainWindow : Window
     {
-        private readonly SignalRClient _signalRClient;
-
-        public MainWindow(SignalRClient signalRClient)
+        public MainWindow(MainWindowViewModel mainWindowViewModel)
         {
-            _signalRClient = signalRClient;
-
-            //_viewModel = viewModel;
+            DataContext = mainWindowViewModel;
             InitializeComponent();
-            SendMessageButton.IsEnabled = false;
-
         }
 
         public void LogInfo(string info)
@@ -29,40 +23,6 @@ namespace GuiClient
         {
             ReceivedMessages.Text += message + "\r\n";
             ReceivedMessages.ScrollToEnd();
-        }
-
-        private void Register(object sender, RoutedEventArgs e)
-        {
-            var name = UserName.Text;
-            if (string.IsNullOrEmpty(name))
-            {
-                return;
-            }
-
-            RegisterButton.IsEnabled = false;
-            SendMessageButton.IsEnabled = true;
-
-            Dispatcher.InvokeAsync(async () =>
-            {
-                await _signalRClient.Register(name);
-            });
-        }
-
-        private void SendMessage(object sender, RoutedEventArgs e)
-        {
-            var target = Receiver.Text;
-            var message = Message.Text;
-            Message.Text = "";
-
-            if (string.IsNullOrEmpty(target))
-            {
-                Dispatcher.InvokeAsync(async () => await _signalRClient.SendMessageToAllClients(message));
-
-            }
-            else
-            {
-                Dispatcher.InvokeAsync(async () => await _signalRClient.SendMessageToClient(target, message));
-            }
         }
     }
 }
