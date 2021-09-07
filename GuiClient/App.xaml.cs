@@ -8,25 +8,19 @@ using Shared;
 
 namespace GuiClient
 {
-    /// <summary>
-    /// Interaction logic for App.xaml
-    /// </summary>
     public partial class App : Application
     {
         private readonly IHost _host;
+        private static HubConnection _connection;
 
         public App()
         {
+            _connection = CreateHubConnection();
             _host = CreateHostBuilder().Build();
         }
 
-        static IHostBuilder CreateHostBuilder()
+        private static IHostBuilder CreateHostBuilder()
         {
-            var connection = new HubConnectionBuilder()
-                .WithUrl(new Uri("http://localhost:5000/communicationsignalrhub"))
-                .WithAutomaticReconnect(new NeverEndingRetryPolicy(TimeSpan.FromSeconds(10)))
-                .Build();
-
             return Host
                 .CreateDefaultBuilder()
                 .ConfigureLogging(logging =>
@@ -36,11 +30,19 @@ namespace GuiClient
                 })
                 .ConfigureServices((_, services) =>
                 {
-                    services.AddSingleton(connection);
+                    services.AddSingleton(_connection);
                     services.AddSingleton<MainWindowViewModel>();
                     services.AddSingleton<MainWindow>();
                     services.AddSingleton<SignalRClient>();
                 });
+        }
+
+        private static HubConnection CreateHubConnection()
+        {
+            return new HubConnectionBuilder()
+                .WithUrl(new Uri("http://localhost:5000/communicationsignalrhub"))
+                .WithAutomaticReconnect(new NeverEndingRetryPolicy(TimeSpan.FromSeconds(10)))
+                .Build();
         }
 
         protected override async void OnStartup(StartupEventArgs startupEventArgs)
@@ -55,8 +57,8 @@ namespace GuiClient
 
         protected override async void OnExit(ExitEventArgs exitEventArgs)
         {
-            await _host.Services.GetRequiredService<HubConnection>().DisposeAsync();
             await _host.StopAsync();
+            _host.Dispose();
 
             base.OnExit(exitEventArgs);
         }
