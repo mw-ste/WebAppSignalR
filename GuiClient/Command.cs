@@ -4,7 +4,7 @@ using System.Windows.Input;
 
 namespace GuiClient
 {
-    internal class Command : ICommand
+    public class Command : ICommand
     {
         private bool _isExecuting;
         private bool IsExecuting
