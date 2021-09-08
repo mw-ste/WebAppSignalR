@@ -65,7 +65,7 @@ namespace GuiClient
         {
             var windowLoggerProvider = _host.Services.GetRequiredService<GenericLoggerProvider>();
             var windowViewModel = _host.Services.GetRequiredService<MainWindowViewModel>();
-            windowLoggerProvider.SetLogMethod(message => windowViewModel.InfoLog += $"{message}\n");
+            windowLoggerProvider.SetLogMethod(windowViewModel.WriteToLog);
         }
 
         protected override async void OnExit(ExitEventArgs exitEventArgs)

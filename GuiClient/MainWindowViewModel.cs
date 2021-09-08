@@ -1,12 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace GuiClient
 {
     public class MainWindowViewModel : INotifyPropertyChanged
     {
         private readonly SignalRClient _signalRClient;
+        private readonly ILogger<MainWindowViewModel> _logger;
 
         private bool _registered;
         private string _messageLog;
@@ -15,9 +17,10 @@ namespace GuiClient
         private string _message;
         private string _receiver;
 
-        public MainWindowViewModel(SignalRClient signalRClient)
+        public MainWindowViewModel(SignalRClient signalRClient, ILogger<MainWindowViewModel> logger)
         {
             _signalRClient = signalRClient;
+            _logger = logger;
 
             RegisterCommand = new Command(
                 async _ => await Register(),
@@ -27,6 +30,10 @@ namespace GuiClient
                 async _ => await SendMessage(),
                 _ => Registered && !string.IsNullOrEmpty(Message));
 
+            DisconnectMeCommand = new Command(
+                async _ => await DisconnectMe(),
+                _ => Registered);
+
             Subscribe();
         }
 
@@ -34,9 +41,9 @@ namespace GuiClient
         {
             _signalRClient.MessageReceived += (user, message) => MessageLog += $"{user}: {message}\n";
 
-            _signalRClient.MessageSent += () => InfoLog += "Message sent\n";
-            _signalRClient.UserJoined += user => InfoLog += $"User {user} joined\n";
-            _signalRClient.UserLeft += user => InfoLog += $"User {user} left\n";
+            _signalRClient.MessageSent += () => _logger.LogInformation("Message sent");
+            _signalRClient.UserJoined += user => _logger.LogInformation($"User {user} joined");
+            _signalRClient.UserLeft += user => _logger.LogInformation($"User {user} left");
         }
 
         private async Task Register()
@@ -46,6 +53,7 @@ namespace GuiClient
             Registered = true;
 
             RegisterCommand.NotifyCanExecuteChanged();
+            DisconnectMeCommand.NotifyCanExecuteChanged();
             SendMessageCommand.NotifyCanExecuteChanged();
         }
 
@@ -64,8 +72,14 @@ namespace GuiClient
             Message = string.Empty;
         }
 
+        private async Task DisconnectMe()
+        {
+            await _signalRClient.DisconnectMe();
+        }
+
         public Command RegisterCommand { get; }
         public Command SendMessageCommand { get; }
+        public Command DisconnectMeCommand { get; }
 
         public bool Registered
         {
@@ -120,6 +134,11 @@ namespace GuiClient
 
             currentValue = newValue;
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public void WriteToLog(string log)
+        {
+            InfoLog += $"{log}\n";
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

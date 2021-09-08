@@ -23,20 +23,23 @@ namespace Shared
 
         public TimeSpan? NextRetryDelay(RetryContext retryContext)
         {
-            LogRetry(retryContext);
-
-            return retryContext.PreviousRetryCount switch
+            var delay = retryContext.PreviousRetryCount switch
             {
                 0 => TimeSpan.Zero,
                 1 => TimeSpan.FromSeconds(2),
                 _ => _delay
             };
+
+            LogRetry(retryContext, delay);
+
+            return delay;
         }
 
-        private void LogRetry(RetryContext retryContext)
+        private void LogRetry(RetryContext retryContext, TimeSpan delay)
         {
-            var message = $"Retry attempt {retryContext.PreviousRetryCount + 1}, " +
-                          $"{_delay} delay before next retry. ";
+            var message =
+                $"Retry attempt {retryContext.PreviousRetryCount + 1}, " +
+                $"{delay} delay before next retry.";
             _log(message);
         }
     }

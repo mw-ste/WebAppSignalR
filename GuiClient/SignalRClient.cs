@@ -106,6 +106,12 @@ namespace GuiClient
             await _hubConnection.SendCoreAsync("SendMessageToClient", new object[] { _name, target, message });
         }
 
+        public async Task DisconnectMe()
+        {
+            EnsureConnected();
+            await _hubConnection.SendCoreAsync("DisconnectMe", Array.Empty<object>());
+        }
+
         private void EnsureConnected()
         {
             if (string.IsNullOrEmpty(_name) || _hubConnection.State != HubConnectionState.Connected)
