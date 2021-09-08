@@ -15,11 +15,16 @@
   - configured to run a SignalR hub, using an Azure SignalR service
 
 - **CliClient**
+
   - a very simple (bear with me) cli tool to send and receive messages sent via SignalR
   - run several instances to "chat" with each other
   - on startup you need to provide a unique "user name"
   - then you can use the user names of other instances to send messages to them
   - leave the user name empty to message all clients
+  - enter "exit" as target name or message to receive a "connection closed" from the backend
+
+- **GuiClient**
+  - to be done
 
 ## Learnings
 
@@ -42,14 +47,25 @@
 - stored in: `%APPDATA%\Microsoft\UserSecrets\<user_secrets_id>\secrets.json`
 - in `Startup.cs` in `ConfigureServices`: `services.AddSignalR().AddAzureSignalR();`
 
+### Running without Azure
+
+- if you get the following error, then your have not configured a connection string
+- `Microsoft.Azure.SignalR.Common.AzureSignalRConfigurationNoEndpointException: No connection string was specified.`
+- to run the SignalR server locally instead of the Azure SignalR service, remove `.AddAzureSignalR(...)` from the line `services.AddSignalR().AddAzureSignalR();` in the file `Startup.cs`
+
 ### Groups
 
 - group membership isn't preserved when a connection reconnects
 - the connection needs to rejoin the group when it's re-established.
 
-
 ### Reconnecting a disconnected HubConnection
 
-* when the connection was disconnected by the hub calling `Context.Abort();` &rarr; hub connection can be reconnected by the client
-* when the connection was disconnected by the client calling `_hubConnection.StopAsync();` &rarr; hub connection can be reconnected by the client
-* when the connection was disconnected by the client calling `_hubConnection.DisposeAsync();` &rarr; hub connection can **not** be reconnected by the client
+- when the connection was disconnected by the hub calling `Context.Abort();` &rarr; hub connection can be reconnected by the client
+- when the connection was disconnected by the client calling `_hubConnection.StopAsync();` &rarr; hub connection can be reconnected by the client
+- when the connection was disconnected by the client calling `_hubConnection.DisposeAsync();` &rarr; hub connection can **not** be reconnected by the client
+
+## SignalR, WPF, MVVM, DI
+
+- https://docs.microsoft.com/en-us/dotnet/core/extensions/dependency-injection
+- https://intellitect.com/getting-started-model-view-viewmodel-mvvm-pattern-using-windows-presentation-framework-wpf/
+- https://marcominerva.wordpress.com/2019/11/07/update-on-using-hostbuilder-dependency-injection-and-service-provider-with-net-core-3-0-wpf-applications/
