@@ -60,6 +60,7 @@ namespace GuiClient
                 await _signalRClient.SendMessageToClient(Receiver, Message);
             }
 
+            MessageLog += $"{UserName}: {Message}\n";
             Message = string.Empty;
         }
 
@@ -124,20 +125,3 @@ namespace GuiClient
         public event PropertyChangedEventHandler PropertyChanged;
     }
 }
-
-/*
- * _logInfo($"Reconnecting. Connection was interrupted because of \"{exception}\"");
- * _logInfo(
-        $"Hub reconnected with new id {newConnectionId}, " +
-        $"new connection state \"{_hubConnection.State}\"");
-
-    _logInfo(
-        $"Hub connection {_hubConnection.ConnectionId} was closed!\n" +
-        $"Reason: {exception}");
-
-    _logInfo("Message successfully sent");
-
-    _logInfo($"{user} joined the conversation");
-
-    _logInfo($"{user} left the conversation");
- */

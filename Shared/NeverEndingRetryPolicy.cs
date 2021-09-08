@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.Logging;
 
 namespace Shared
 {
@@ -14,10 +15,10 @@ namespace Shared
             _log = Console.WriteLine;
         }
 
-        public NeverEndingRetryPolicy(TimeSpan delay, Action<string> logMethod)
+        public NeverEndingRetryPolicy(TimeSpan delay, ILogger logger)
         {
             _delay = delay;
-            _log = logMethod;
+            _log = message => logger.LogInformation(message);
         }
 
         public TimeSpan? NextRetryDelay(RetryContext retryContext)

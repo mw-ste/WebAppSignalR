@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows;
+using System.Windows.Threading;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -11,37 +12,42 @@ namespace GuiClient
     public partial class App : Application
     {
         private readonly IHost _host;
-        private static HubConnection _connection;
 
         public App()
         {
-            _connection = CreateHubConnection();
-            _host = CreateHostBuilder().Build();
+            _host = CreateHostBuilder();
         }
 
-        private static IHostBuilder CreateHostBuilder()
+        private static IHost CreateHostBuilder()
         {
+            var windowLoggerProvider = new GenericLoggerProvider();
+
             return Host
                 .CreateDefaultBuilder()
                 .ConfigureLogging(logging =>
                 {
                     logging.ClearProviders();
                     logging.AddConsole();
+                    logging.AddProvider(windowLoggerProvider);
                 })
                 .ConfigureServices((_, services) =>
                 {
-                    services.AddSingleton(_connection);
+                    services.AddSingleton(CreateHubConnection);
+                    services.AddSingleton(windowLoggerProvider);
                     services.AddSingleton<MainWindowViewModel>();
                     services.AddSingleton<MainWindow>();
                     services.AddSingleton<SignalRClient>();
-                });
+                })
+                .Build();
         }
 
-        private static HubConnection CreateHubConnection()
+        private static HubConnection CreateHubConnection(IServiceProvider serviceProvider)
         {
+            var logger = serviceProvider.GetRequiredService<ILogger<NeverEndingRetryPolicy>>();
+
             return new HubConnectionBuilder()
                 .WithUrl(new Uri("http://localhost:5000/communicationsignalrhub"))
-                .WithAutomaticReconnect(new NeverEndingRetryPolicy(TimeSpan.FromSeconds(10)))
+                .WithAutomaticReconnect(new NeverEndingRetryPolicy(TimeSpan.FromSeconds(10), logger))
                 .Build();
         }
 
@@ -49,10 +55,18 @@ namespace GuiClient
         {
             await _host.StartAsync();
 
-            var mainWindow = _host.Services.GetRequiredService<MainWindow>();
-            mainWindow.Show();
+            ConfigureLogToMainWindow();
+
+            _host.Services.GetRequiredService<MainWindow>().Show();
 
             base.OnStartup(startupEventArgs);
+        }
+
+        private void ConfigureLogToMainWindow()
+        {
+            var windowLoggerProvider = _host.Services.GetRequiredService<GenericLoggerProvider>();
+            var windowViewModel = _host.Services.GetRequiredService<MainWindowViewModel>();
+            windowLoggerProvider.SetLogMethod(message => windowViewModel.InfoLog += $"{message}\n");
         }
 
         protected override async void OnExit(ExitEventArgs exitEventArgs)
@@ -61,6 +75,15 @@ namespace GuiClient
             _host.Dispose();
 
             base.OnExit(exitEventArgs);
+        }
+
+        private void HandleUnhandledExceptions(object sender, DispatcherUnhandledExceptionEventArgs eventArgs)
+        {
+            MessageBox.Show(
+                eventArgs.Exception.ToString(),
+                "Unhandled Exception",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
         }
     }
 }
