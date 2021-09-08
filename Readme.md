@@ -21,23 +21,36 @@
   - on startup you need to provide a unique "user name"
   - then you can use the user names of other instances to send messages to them
   - leave the user name empty to message all clients
-  - enter "exit" as target name or message to receive a "connection closed" from the backend
+  - enter "exit" as target name or message to receive a "connection closed" from the hub
 
 - **GuiClient**
-  - to be done
+
+  - **There is a problem in the shutdown of the gui that I have not fixed yet!**
+  - simple WPF gui client
+  - run several instances to "chat" with each other
+  - register with a user name to start the SignalR connection
+  - then you can use the user names of other instances to send messages to them
+  - leave the user name empty to message all clients
+  - press "SiconnectMe" to force a "connection closed" from the hub
 
 ## Learnings
 
 ### SignalR Hub
 
-- hubs are transient
+- hubs are transient!
 - don't store state in a property on the hub class. Every hub method call is executed on a new hub instance.
 - use await when calling asynchronous methods that depend on the hub staying alive. For example `Clients.All.SendAsync(...)`
 
 ### IHubContext
 
 - the IHubContext is for sending notifications to clients
-- it is not used to call methods on the Hub
+- it is not used to call methods on the hub
+
+### Evil surveillance logger
+- the backend opens a client connection to the hub provided by itself
+- so the rout is something like: client -> SignalR service -> hub -> SignalR service -> hub -> evil surveillance logger
+- this is a bit chatty
+- so whenever possible, call stuff directly from the hub (have the dependencies injected)
 
 ### Adding App Secrets for the Azure SignalR service
 
