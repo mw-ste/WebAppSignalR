@@ -33,8 +33,8 @@ namespace GuiClient
         private void Subscribe()
         {
             _signalRClient.MessageReceived += (user, message) => MessageLog += $"{user}: {message}\n";
-            _signalRClient.MessageSent += () => InfoLog += "Message sent\n";
 
+            _signalRClient.MessageSent += () => InfoLog += "Message sent\n";
             _signalRClient.UserJoined += user => InfoLog += $"User {user} joined\n";
             _signalRClient.UserLeft += user => InfoLog += $"User {user} left\n";
         }

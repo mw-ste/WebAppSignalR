@@ -27,7 +27,6 @@ namespace GuiClient
                 .ConfigureLogging(logging =>
                 {
                     logging.ClearProviders();
-                    logging.AddConsole();
                     logging.AddProvider(windowLoggerProvider);
                 })
                 .ConfigureServices((_, services) =>

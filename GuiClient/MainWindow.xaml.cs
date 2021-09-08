@@ -11,18 +11,9 @@ namespace GuiClient
         {
             DataContext = mainWindowViewModel;
             InitializeComponent();
-        }
 
-        public void LogInfo(string info)
-        {
-            Log.Text += info + "\r\n";
-            Log.ScrollToEnd();
-        }
-
-        public void LogMessage(string message)
-        {
-            ReceivedMessages.Text += message + "\r\n";
-            ReceivedMessages.ScrollToEnd();
+            Log.TextChanged += (_, _) => Log.ScrollToEnd();
+            ReceivedMessages.TextChanged += (_, _) => ReceivedMessages.ScrollToEnd();
         }
     }
 }
