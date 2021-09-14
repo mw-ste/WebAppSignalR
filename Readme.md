@@ -47,6 +47,7 @@
 - it is not used to call methods on the hub
 
 ### Evil surveillance logger
+
 - the backend opens a client connection to the hub provided by itself
 - so the rout is something like: client -> SignalR service -> hub -> SignalR service -> hub -> evil surveillance logger
 - this is a bit chatty
@@ -76,6 +77,16 @@
 - when the connection was disconnected by the hub calling `Context.Abort();` &rarr; hub connection can be reconnected by the client
 - when the connection was disconnected by the client calling `_hubConnection.StopAsync();` &rarr; hub connection can be reconnected by the client
 - when the connection was disconnected by the client calling `_hubConnection.DisposeAsync();` &rarr; hub connection can **not** be reconnected by the client
+
+### IRetryPolicy
+
+- a retry policy can be registered to handle lost connections
+- if no retry policy is registered, or the retry policy "timed out" (if implemented in such a way) the `Closed` event of the hub connection will be fired
+- you can subscribe to this event to "manually" try to open the connection again (`_hubConnection.StartAsync();`)
+- if this is not successful, you will get an exception (`HttpRequestException`)
+- the `Closed` event will not fire again
+- as a workaround for temporary unavailable connections, you can try to open the connection again in a loop, like in `StartSafelyAsync` in `HubConnectionExtensions`
+- this will also work for initially starting the connection
 
 ## SignalR, WPF, MVVM, DI
 
