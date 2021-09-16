@@ -25,13 +25,13 @@
 
 - **GuiClient**
 
-  - **There is a problem in the shutdown of the gui that I have not fixed yet!**
+  - ~~There is a problem in the shutdown of the gui that I have not fixed yet!~~
   - simple WPF gui client
   - run several instances to "chat" with each other
   - register with a user name to start the SignalR connection
   - then you can use the user names of other instances to send messages to them
   - leave the user name empty to message all clients
-  - press "SiconnectMe" to force a "connection closed" from the hub
+  - press "DisconnectMe" to force a "connection closed" from the hub
 
 ## Learnings
 

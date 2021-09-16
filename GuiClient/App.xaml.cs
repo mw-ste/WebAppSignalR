@@ -57,6 +57,10 @@ namespace GuiClient
             ConfigureLogToMainWindow();
 
             var mainWindow = _host.Services.GetRequiredService<MainWindow>();
+
+            // not sure why, but otherwise the app will hang in a deadlock and not shutdown...
+            mainWindow.Closed += async (_, _) => await _host.Services.GetRequiredService<SignalRClient>().Stop();
+
             mainWindow.Show();
 
             base.OnStartup(startupEventArgs);
@@ -73,7 +77,6 @@ namespace GuiClient
         {
            using (_host)
            {
-               await _host.Services.GetRequiredService<SignalRClient>().Stop();
                await _host.StopAsync(TimeSpan.FromSeconds(5));
            }
 
