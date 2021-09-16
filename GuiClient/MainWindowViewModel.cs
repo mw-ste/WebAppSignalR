@@ -42,8 +42,9 @@ namespace GuiClient
             _signalRClient.MessageReceived += (user, message) => MessageLog += $"{user}: {message}\n";
 
             _signalRClient.MessageSent += () => _logger.LogInformation("Message sent");
-            _signalRClient.UserJoined += user => _logger.LogInformation($"User {user} joined");
-            _signalRClient.UserLeft += user => _logger.LogInformation($"User {user} left");
+            _signalRClient.UserJoined += user => _logger.LogInformation($"User {user} joined the conversation");
+            _signalRClient.UserConnected += user => _logger.LogInformation($"User {user} connected");
+            _signalRClient.UserDisconnected += user => _logger.LogInformation($"User {user} disconnected");
         }
 
         private async Task Register()

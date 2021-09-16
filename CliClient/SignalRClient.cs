@@ -56,8 +56,8 @@ namespace CliClient
         {
             _hubConnection.On<string, string>(nameof(ReceiveMessage), ReceiveMessage);
             _hubConnection.On(nameof(Acknowledge), Acknowledge);
-            _hubConnection.On<string>(nameof(NotifyUserAdded), NotifyUserAdded);
-            _hubConnection.On<string>(nameof(NotifyUserLeft), NotifyUserLeft);
+            _hubConnection.On<string>(nameof(NotifyUserConnected), NotifyUserConnected);
+            _hubConnection.On<string>(nameof(NotifyUserDisconnected), NotifyUserDisconnected);
         }
 
         public Task ReceiveMessage(string sender, string message)
@@ -72,15 +72,21 @@ namespace CliClient
             return Task.CompletedTask;
         }
 
-        public Task NotifyUserAdded(string user)
+        public Task NotifyUserRegistered(string userName)
         {
-            Console.WriteLine($"New user {user} joined the conversation");
+            Console.WriteLine($"New user {userName} joined the conversation");
             return Task.CompletedTask;
         }
 
-        public Task NotifyUserLeft(string user)
+        public Task NotifyUserConnected(string userId)
         {
-            Console.WriteLine($"User {user} left the conversation");
+            Console.WriteLine($"New user {userId} connected to the hub");
+            return Task.CompletedTask;
+        }
+
+        public Task NotifyUserDisconnected(string userId)
+        {
+            Console.WriteLine($"User {userId} disconnected from the hub");
             return Task.CompletedTask;
         }
 
@@ -101,7 +107,7 @@ namespace CliClient
 
         public async Task SendDisconnect()
         {
-            await _hubConnection.SendCoreAsync("DisconnectMe", new object[0]);
+            await _hubConnection.SendCoreAsync("DisconnectMe", Array.Empty<object>());
         }
 
         public async Task Disconnect()

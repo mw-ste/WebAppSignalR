@@ -15,7 +15,8 @@ namespace GuiClient
         public event Action<string, string> MessageReceived;
         public event Action MessageSent;
         public event Action<string> UserJoined;
-        public event Action<string> UserLeft;
+        public event Action<string> UserConnected;
+        public event Action<string> UserDisconnected;
 
         public SignalRClient(HubConnection hubConnection, ILogger<SignalRClient> logger)
         {
@@ -32,8 +33,8 @@ namespace GuiClient
 
             _hubConnection.On<string, string>(nameof(ReceiveMessage), ReceiveMessage);
             _hubConnection.On(nameof(Acknowledge), Acknowledge);
-            _hubConnection.On<string>(nameof(NotifyUserAdded), NotifyUserAdded);
-            _hubConnection.On<string>(nameof(NotifyUserLeft), NotifyUserLeft);
+            _hubConnection.On<string>(nameof(NotifyUserConnected), NotifyUserConnected);
+            _hubConnection.On<string>(nameof(NotifyUserDisconnected), NotifyUserDisconnected);
         }
 
         public async Task Stop()
@@ -44,8 +45,8 @@ namespace GuiClient
 
             _hubConnection.Remove(nameof(ReceiveMessage));
             _hubConnection.Remove(nameof(Acknowledge));
-            _hubConnection.Remove(nameof(NotifyUserAdded));
-            _hubConnection.Remove(nameof(NotifyUserLeft));
+            _hubConnection.Remove(nameof(NotifyUserConnected));
+            _hubConnection.Remove(nameof(NotifyUserDisconnected));
 
             await _hubConnection.StopAsync();
         }
@@ -90,15 +91,21 @@ namespace GuiClient
             return Task.CompletedTask;
         }
 
-        public Task NotifyUserAdded(string user)
+        public Task NotifyUserRegistered(string userName)
         {
-            UserJoined?.Invoke(user);
+            UserJoined?.Invoke(userName);
             return Task.CompletedTask;
         }
 
-        public Task NotifyUserLeft(string user)
+        public Task NotifyUserConnected(string userId)
         {
-            UserLeft?.Invoke(user);
+            UserConnected?.Invoke(userId);
+            return Task.CompletedTask;
+        }
+
+        public Task NotifyUserDisconnected(string userId)
+        {
+            UserDisconnected?.Invoke(userId);
             return Task.CompletedTask;
         }
 

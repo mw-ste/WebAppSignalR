@@ -38,14 +38,23 @@ namespace Backend
                 .Build();
 
             _connection.On<string, string>("ReceiveMessage", LogMessage);
+            _connection.On<string>("NotifyUserRegistered", RegisterAsUser);
 
             _connection.Closed += OnClosed;
             _connection.Reconnected += Reconnected;
         }
 
+        private async Task RegisterAsUser(string userName)
+        {
+            _logger.LogInformation(
+                $"Registering as user \"{userName}\"... muhahahaha");
+
+            await _connection.SendCoreAsync("RegisterWithName", new object[] { userName });
+        }
+
         private Task Reconnected(string newConnectionId)
         {
-            Console.WriteLine(
+            _logger.LogInformation(
                 $"Hub reconnected with new id {newConnectionId}, " +
                 $"new connection state \"{_connection.State}\"");
 
@@ -54,16 +63,16 @@ namespace Backend
 
         private Task OnClosed(Exception exception)
         {
-            Console.WriteLine(
+            _logger.LogInformation(
                 $"Hub connection {_connection.ConnectionId} was closed!\n" +
                 $"Reason: {exception}");
 
             return Task.CompletedTask;
         }
 
-        private void LogMessage(string user, string message)
+        private void LogMessage(string sender, string message)
         {
-            _logger.LogInformation($"User \"{user}\" published message \"{message}\"");
+            _logger.LogInformation($"User \"{sender}\" published message \"{message}\"");
         }
 
         public async Task Start()

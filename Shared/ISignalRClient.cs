@@ -8,8 +8,10 @@
 
         Task Acknowledge();
 
-        Task NotifyUserAdded(string user);
+        Task NotifyUserRegistered(string userName);
 
-        Task NotifyUserLeft(string user);
+        Task NotifyUserConnected(string userId);
+
+        Task NotifyUserDisconnected(string userId);
     }
 }

@@ -45,6 +45,10 @@ namespace Backend
             _logger.LogInformation($"RegisterWithName {sender} with id {Context.ConnectionId}");
 
             await Groups.AddToGroupAsync(Context.ConnectionId, sender);
+
+            await Clients
+                .Others
+                .NotifyUserRegistered(sender);
         }
 
         public void DisconnectMe()
@@ -60,7 +64,7 @@ namespace Backend
 
             await Clients
                 .Others
-                .NotifyUserAdded(Context.ConnectionId);
+                .NotifyUserConnected(Context.ConnectionId);
         }
 
         public override async Task OnDisconnectedAsync(Exception exception)
@@ -69,7 +73,7 @@ namespace Backend
 
             await Clients
                 .Others
-                .NotifyUserLeft(Context.ConnectionId);
+                .NotifyUserDisconnected(Context.ConnectionId);
 
             await base.OnDisconnectedAsync(exception);
         }
