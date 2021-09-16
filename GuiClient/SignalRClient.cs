@@ -36,6 +36,20 @@ namespace GuiClient
             _hubConnection.On<string>(nameof(NotifyUserLeft), NotifyUserLeft);
         }
 
+        public async Task Stop()
+        {
+            _hubConnection.Closed -= OnClosed;
+            _hubConnection.Reconnected -= Reconnected;
+            _hubConnection.Reconnecting -= Reconnecting;
+
+            _hubConnection.Remove(nameof(ReceiveMessage));
+            _hubConnection.Remove(nameof(Acknowledge));
+            _hubConnection.Remove(nameof(NotifyUserAdded));
+            _hubConnection.Remove(nameof(NotifyUserLeft));
+
+            await _hubConnection.StopAsync();
+        }
+
         private async Task StartConnection()
         {
             await _hubConnection.StartSafelyAsync(TimeSpan.FromSeconds(10), _logger);

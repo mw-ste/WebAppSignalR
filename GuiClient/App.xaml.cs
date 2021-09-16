@@ -56,7 +56,8 @@ namespace GuiClient
 
             ConfigureLogToMainWindow();
 
-            _host.Services.GetRequiredService<MainWindow>().Show();
+            var mainWindow = _host.Services.GetRequiredService<MainWindow>();
+            mainWindow.Show();
 
             base.OnStartup(startupEventArgs);
         }
@@ -70,10 +71,13 @@ namespace GuiClient
 
         protected override async void OnExit(ExitEventArgs exitEventArgs)
         {
-            await _host.StopAsync();
-            _host.Dispose();
+           using (_host)
+           {
+               await _host.Services.GetRequiredService<SignalRClient>().Stop();
+               await _host.StopAsync(TimeSpan.FromSeconds(5));
+           }
 
-            base.OnExit(exitEventArgs);
+           base.OnExit(exitEventArgs);
         }
 
         private void HandleUnhandledExceptions(object sender, DispatcherUnhandledExceptionEventArgs eventArgs)
